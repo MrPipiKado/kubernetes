@@ -4,7 +4,6 @@ kind: ConfigMap
 metadata:
   name: petclinic-config
   namespace: default
-  resourceVersion: "516"
 data:
   application-mysql2.properties: |
     database=mysql
