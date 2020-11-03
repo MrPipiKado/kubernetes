@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
       - name: petclinic
-        image: mrpipikado/petclinic:petclinic
+        image: mrpipikado/final:latest
         ports:
         - containerPort: 8080
           name: "http-server"
