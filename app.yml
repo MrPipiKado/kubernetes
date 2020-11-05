@@ -1,17 +1,167 @@
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secret
+type: Opaque
+data:
+  username: cGV0Y2xpbmlj
+  password: cGV0Y2xpbmlj
+  rootpassword: cGV0Y2xpbmlj
+  dbname: cGV0Y2xpbmlj
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: petclinic-config
-  namespace: default
-  resourceVersion: "516"
+  name: mysql-config
 data:
-  application-mysql2.properties: |
-    database=mysql
-    spring.datasource.url=jdbc:mysql://10.0.3.237/petclinic
-    spring.datasource.username=petclinic
-    spring.datasource.password=petclinic
-    spring.datasource.initialization-mode=always
+  mysqld.conf: |
+    [mysqld_safe]
+    socket          = /var/run/mysqld/mysqld.sock
+    nice            = 0
+    [mysqld]
+    user            = mysql
+    pid-file        = /var/run/mysqld/mysqld.pid
+    socket          = /var/run/mysqld/mysqld.sock
+    port            = 3306
+    basedir         = /usr
+    datadir         = /var/lib/mysql
+    tmpdir          = /tmp
+    lc-messages-dir = /usr/share/mysql
+    skip-external-locking
+    bind-address            = 0.0.0.0
+    key_buffer_size         = 16M
+    max_allowed_packet      = 16M
+    thread_stack            = 192K
+    thread_cache_size       = 8
+    myisam-recover-options  = BACKUP
+    query_cache_limit       = 1M
+    query_cache_size        = 16M
+    log_error = /var/log/mysql/error.log
+    expire_logs_days        = 10---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pvc
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: mysql
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - image: mysql:5.7.8
+        name: mysql
+        env:
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: dbname
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: username
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: password
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: rootpassword
+        ports:
+        - containerPort: 3306
+          name: mysql
+        readinessProbe:
+          exec:
+            command:
+            - bash
+            - "-c"
+            - |
+              mysql -p$MYSQL_ROOT_PASSWORD -e 'SHOW DATABASES'
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          timeoutSeconds: 1
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - |
+                until mysql -p$MYSQL_ROOT_PASSWORD -e 'SHOW DATABASES'; do echo waiting for mysql server; sleep 2; done;
+                mysql -p$MYSQL_ROOT_PASSWORD -e 'CREATE DATABASE IF NOT EXISTS petclinic;'
+                mysql -p$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE < /srv/schema.sql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+        - name: mysql-conf
+          mountPath: /etc/mysql/conf.d
+        - name: mysql-schem
+          mountPath: /srv
+      volumes:
+      - name: mysql-conf
+        configMap:
+          name: mysql-config
+      - name: mysql-schem
+        secret:
+          secretName: db-schema-secret
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+apiVersion: v1
+data:
+  application-mysql2.properties: ZGF0YWJhc2U9bXlzcWwKc3ByaW5nLmRhdGFzb3VyY2UudXJsPWpkYmM6bXlzcWw6Ly9teXNxbC9wZXRjbGluaWMKc3ByaW5nLmRhdGFzb3VyY2UudXNlcm5hbWU9cGV0Y2xpbmljCnNwcmluZy5kYXRhc291cmNlLnBhc3N3b3JkPXBldGNsaW5pYwpzcHJpbmcuZGF0YXNvdXJjZS5pbml0aWFsaXphdGlvbi1tb2RlPWFsd2F5cwpzcHJpbmcubWVzc2FnZXMuYmFzZW5hbWU9bWVzc2FnZXMvbWVzc2FnZXMK
+kind: Secret
+metadata:
+  name: app-profile
+type: Opaque
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -41,10 +191,14 @@ spec:
         volumeMounts:
         - name: petclinic-conf
           mountPath: /tmp/config
+      initContainers:
+      - name: init-mysql
+        image: busybox
+        command: ['sh', '-c', 'until nslookup mysql; do echo waiting for mysql; sleep 2; done;']
       volumes:
       - name: petclinic-conf
-        configMap:
-          name: petclinic-config
+        secret:
+          secretName: app-profile
 ---
 apiVersion: v1
 kind: Service
@@ -56,4 +210,4 @@ spec:
   ports:
     - port: 8080
       targetPort: 8080
-  type: NodePort
+  type: LoadBalancer
