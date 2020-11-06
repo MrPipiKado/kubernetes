@@ -182,7 +182,7 @@ spec:
     spec:
       containers:
       - name: petclinic
-        image: mrpipikado/petclinic:petclinic
+        image: mrpipikado/final_project:latest
         ports:
         - containerPort: 8080
           name: "http-server"
