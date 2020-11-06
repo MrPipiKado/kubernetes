@@ -7,7 +7,7 @@ metadata:
 data:
   application-mysql2.properties: |
     database=mysql
-    spring.datasource.url=jdbc:mysql://10.0.3.130/petclinic
+    spring.datasource.url=jdbc:mysql://10.0.3.125/petclinic
     spring.datasource.username=petclinic
     spring.datasource.password=petclinic
     spring.datasource.initialization-mode=always
