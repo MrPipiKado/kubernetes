@@ -1,0 +1,166 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secret
+type: Opaque
+data:
+  username: cGV0Y2xpbmlj
+  password: cGV0Y2xpbmlj
+  rootpassword: cGV0Y2xpbmlj
+  dbname: cGV0Y2xpbmlj
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+data:
+  mysqld.conf: |
+    [mysqld_safe]
+    socket          = /var/run/mysqld/mysqld.sock
+    nice            = 0
+    [mysqld]
+    user            = mysql
+    pid-file        = /var/run/mysqld/mysqld.pid
+    socket          = /var/run/mysqld/mysqld.sock
+    port            = 3306
+    basedir         = /usr
+    datadir         = /var/lib/mysql
+    tmpdir          = /tmp
+    lc-messages-dir = /usr/share/mysql
+    skip-external-locking
+    bind-address            = 0.0.0.0
+    key_buffer_size         = 16M
+    max_allowed_packet      = 16M
+    thread_stack            = 192K
+    thread_cache_size       = 8
+    myisam-recover-options  = BACKUP
+    query_cache_limit       = 1M
+    query_cache_size        = 16M
+    log_error = /var/log/mysql/error.log
+    expire_logs_days        = 10
+---
+apiVersion: v1
+data:
+  schema.sql: Q1JFQVRFIFRBQkxFIElGIE5PVCBFWElTVFMgdmV0cyAoCiAgICBpZCBJTlQoNCkgVU5TSUdORUQgTk9UIE5VTEwgQVVUT19JTkNSRU1FTlQgUFJJTUFSWSBLRVksCiAgICBmaXJzdF9uYW1lIFZBUkNIQVIoMzApLAogICAgbGFzdF9uYW1lIFZBUkNIQVIoMzApLAogICAgSU5ERVgobGFzdF9uYW1lKQogICAgKSBlbmdpbmU9SW5ub0RCOwogICAgQ1JFQVRFIFRBQkxFIElGIE5PVCBFWElTVFMgc3BlY2lhbHRpZXMgKAogICAgaWQgSU5UKDQpIFVOU0lHTkVEIE5PVCBOVUxMIEFVVE9fSU5DUkVNRU5UIFBSSU1BUlkgS0VZLAogICAgbmFtZSBWQVJDSEFSKDgwKSwKICAgIElOREVYKG5hbWUpCiAgICApIGVuZ2luZT1Jbm5vREI7CiAgICBDUkVBVEUgVEFCTEUgSUYgTk9UIEVYSVNUUyB2ZXRfc3BlY2lhbHRpZXMgKAogICAgdmV0X2lkIElOVCg0KSBVTlNJR05FRCBOT1QgTlVMTCwKICAgIHNwZWNpYWx0eV9pZCBJTlQoNCkgVU5TSUdORUQgTk9UIE5VTEwsCiAgICBGT1JFSUdOIEtFWSAodmV0X2lkKSBSRUZFUkVOQ0VTIHZldHMoaWQpLAogICAgRk9SRUlHTiBLRVkgKHNwZWNpYWx0eV9pZCkgUkVGRVJFTkNFUyBzcGVjaWFsdGllcyhpZCksCiAgICBVTklRVUUgKHZldF9pZCxzcGVjaWFsdHlfaWQpCiAgICApIGVuZ2luZT1Jbm5vREI7CiAgICBDUkVBVEUgVEFCTEUgSUYgTk9UIEVYSVNUUyB0eXBlcyAoCiAgICBpZCBJTlQoNCkgVU5TSUdORUQgTk9UIE5VTEwgQVVUT19JTkNSRU1FTlQgUFJJTUFSWSBLRVksCiAgICBuYW1lIFZBUkNIQVIoODApLAogICAgSU5ERVgobmFtZSkKICAgICkgZW5naW5lPUlubm9EQjsKICAgIENSRUFURSBUQUJMRSBJRiBOT1QgRVhJU1RTIG93bmVycyAoCiAgICBpZCBJTlQoNCkgVU5TSUdORUQgTk9UIE5VTEwgQVVUT19JTkNSRU1FTlQgUFJJTUFSWSBLRVksCiAgICBmaXJzdF9uYW1lIFZBUkNIQVIoMzApLAogICAgbGFzdF9uYW1lIFZBUkNIQVIoMzApLAogICAgYWRkcmVzcyBWQVJDSEFSKDI1NSksCiAgICBjaXR5IFZBUkNIQVIoODApLAogICAgdGVsZXBob25lIFZBUkNIQVIoMjApLAogICAgSU5ERVgobGFzdF9uYW1lKQogICAgKSBlbmdpbmU9SW5ub0RCOwogICAgQ1JFQVRFIFRBQkxFIElGIE5PVCBFWElTVFMgcGV0cyAoCiAgICBpZCBJTlQoNCkgVU5TSUdORUQgTk9UIE5VTEwgQVVUT19JTkNSRU1FTlQgUFJJTUFSWSBLRVksCiAgICBuYW1lIFZBUkNIQVIoMzApLAogICAgYmlydGhfZGF0ZSBEQVRFLAogICAgdHlwZV9pZCBJTlQoNCkgVU5TSUdORUQgTk9UIE5VTEwsCiAgICBvd25lcl9pZCBJTlQoNCkgVU5TSUdORUQgTk9UIE5VTEwsCiAgICBJTkRFWChuYW1lKSwKICAgIEZPUkVJR04gS0VZIChvd25lcl9pZCkgUkVGRVJFTkNFUyBvd25lcnMoaWQpLAogICAgRk9SRUlHTiBLRVkgKHR5cGVfaWQpIFJFRkVSRU5DRVMgdHlwZXMoaWQpCiAgICApIGVuZ2luZT1Jbm5vREI7CiAgICBDUkVBVEUgVEFCTEUgSUYgTk9UIEVYSVNUUyB2aXNpdHMgKAogICAgaWQgSU5UKDQpIFVOU0lHTkVEIE5PVCBOVUxMIEFVVE9fSU5DUkVNRU5UIFBSSU1BUlkgS0VZLAogICAgcGV0X2lkIElOVCg0KSBVTlNJR05FRCBOT1QgTlVMTCwKICAgIHZpc2l0X2RhdGUgREFURSwKICAgIGRlc2NyaXB0aW9uIFZBUkNIQVIoMjU1KSwKICAgIEZPUkVJR04gS0VZIChwZXRfaWQpIFJFRkVSRU5DRVMgcGV0cyhpZCkKICAgICkgZW5naW5lPUlubm9EQjsKICAgIElOU0VSVCBJR05PUkUgSU5UTyB2ZXRfc3BlY2lhbHRpZXMgVkFMVUVTICg0LCAyKTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyB2ZXRfc3BlY2lhbHRpZXMgVkFMVUVTICg1LCAxKTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyB0eXBlcyBWQUxVRVMgKDEsICdjYXQnKTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyB0eXBlcyBWQUxVRVMgKDIsICdkb2cnKTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyB0eXBlcyBWQUxVRVMgKDMsICdsaXphcmQnKTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyB0eXBlcyBWQUxVRVMgKDQsICdzbmFrZScpOwogICAgSU5TRVJUIElHTk9SRSBJTlRPIHR5cGVzIFZBTFVFUyAoNSwgJ2JpcmQnKTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyB0eXBlcyBWQUxVRVMgKDYsICdoYW1zdGVyJyk7CiAgICBJTlNFUlQgSUdOT1JFIElOVE8gb3duZXJzIFZBTFVFUyAoMSwgJ0dlb3JnZScsICdGcmFua2xpbicsICcxMTAgVy4gTGliZXJ0eSBTdC4nLCAnTWFkaXNvbicsICc2MDg1NTUxMDIzJyk7CiAgICBJTlNFUlQgSUdOT1JFIElOVE8gb3duZXJzIFZBTFVFUyAoMiwgJ0JldHR5JywgJ0RhdmlzJywgJzYzOCBDYXJkaW5hbCBBdmUuJywgJ1N1biBQcmFpcmllJywgJzYwODU1NTE3NDknKTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyBvd25lcnMgVkFMVUVTICgzLCAnRWR1YXJkbycsICdSb2RyaXF1ZXonLCAnMjY5MyBDb21tZXJjZSBTdC4nLCAnTWNGYXJsYW5kJywgJzYwODU1NTg3NjMnKTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyBvd25lcnMgVkFMVUVTICg0LCAnSGFyb2xkJywgJ0RhdmlzJywgJzU2MyBGcmllbmRseSBTdC4nLCAnV2luZHNvcicsICc2MDg1NTUzMTk4Jyk7CiAgICBJTlNFUlQgSUdOT1JFIElOVE8gb3duZXJzIFZBTFVFUyAoNSwgJ1BldGVyJywgJ01jVGF2aXNoJywgJzIzODcgUy4gRmFpciBXYXknLCAnTWFkaXNvbicsICc2MDg1NTUyNzY1Jyk7CiAgICBJTlNFUlQgSUdOT1JFIElOVE8gb3duZXJzIFZBTFVFUyAoNiwgJ0plYW4nLCAnQ29sZW1hbicsICcxMDUgTi4gTGFrZSBTdC4nLCAnTW9ub25hJywgJzYwODU1NTI2NTQnKTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyBvd25lcnMgVkFMVUVTICg3LCAnSmVmZicsICdCbGFjaycsICcxNDUwIE9hayBCbHZkLicsICdNb25vbmEnLCAnNjA4NTU1NTM4NycpOwogICAgSU5TRVJUIElHTk9SRSBJTlRPIG93bmVycyBWQUxVRVMgKDgsICdNYXJpYScsICdFc2NvYml0bycsICczNDUgTWFwbGUgU3QuJywgJ01hZGlzb24nLCAnNjA4NTU1NzY4MycpOwogICAgSU5TRVJUIElHTk9SRSBJTlRPIG93bmVycyBWQUxVRVMgKDksICdEYXZpZCcsICdTY2hyb2VkZXInLCAnMjc0OSBCbGFja2hhd2sgVHJhaWwnLCAnTWFkaXNvbicsICc2MDg1NTU5NDM1Jyk7CiAgICBJTlNFUlQgSUdOT1JFIElOVE8gb3duZXJzIFZBTFVFUyAoMTAsICdDYXJsb3MnLCAnRXN0YWJhbicsICcyMzM1IEluZGVwZW5kZW5jZSBMYS4nLCAnV2F1bmFrZWUnLCAnNjA4NTU1NTQ4NycpOwogICAgSU5TRVJUIElHTk9SRSBJTlRPIHBldHMgVkFMVUVTICgxLCAnTGVvJywgJzIwMDAtMDktMDcnLCAxLCAxKTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyBwZXRzIFZBTFVFUyAoMiwgJ0Jhc2lsJywgJzIwMDItMDgtMDYnLCA2LCAyKTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyBwZXRzIFZBTFVFUyAoMywgJ1Jvc3knLCAnMjAwMS0wNC0xNycsIDIsIDMpOwogICAgSU5TRVJUIElHTk9SRSBJTlRPIHBldHMgVkFMVUVTICg0LCAnSmV3ZWwnLCAnMjAwMC0wMy0wNycsIDIsIDMpOwogICAgSU5TRVJUIElHTk9SRSBJTlRPIHBldHMgVkFMVUVTICg1LCAnSWdneScsICcyMDAwLTExLTMwJywgMywgNCk7CiAgICBJTlNFUlQgSUdOT1JFIElOVE8gcGV0cyBWQUxVRVMgKDYsICdHZW9yZ2UnLCAnMjAwMC0wMS0yMCcsIDQsIDUpOwogICAgSU5TRVJUIElHTk9SRSBJTlRPIHBldHMgVkFMVUVTICg3LCAnU2FtYW50aGEnLCAnMTk5NS0wOS0wNCcsIDEsIDYpOwogICAgSU5TRVJUIElHTk9SRSBJTlRPIHBldHMgVkFMVUVTICg4LCAnTWF4JywgJzE5OTUtMDktMDQnLCAxLCA2KTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyBwZXRzIFZBTFVFUyAoOSwgJ0x1Y2t5JywgJzE5OTktMDgtMDYnLCA1LCA3KTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyBwZXRzIFZBTFVFUyAoMTAsICdNdWxsaWdhbicsICcxOTk3LTAyLTI0JywgMiwgOCk7CiAgICBJTlNFUlQgSUdOT1JFIElOVE8gcGV0cyBWQUxVRVMgKDExLCAnRnJlZGR5JywgJzIwMDAtMDMtMDknLCA1LCA5KTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyBwZXRzIFZBTFVFUyAoMTIsICdMdWNreScsICcyMDAwLTA2LTI0JywgMiwgMTApOwogICAgSU5TRVJUIElHTk9SRSBJTlRPIHBldHMgVkFMVUVTICgxMywgJ1NseScsICcyMDAyLTA2LTA4JywgMSwgMTApOwogICAgSU5TRVJUIElHTk9SRSBJTlRPIHZpc2l0cyBWQUxVRVMgKDEsIDcsICcyMDEwLTAzLTA0JywgJ3JhYmllcyBzaG90Jyk7CiAgICBJTlNFUlQgSUdOT1JFIElOVE8gdmlzaXRzIFZBTFVFUyAoMiwgOCwgJzIwMTEtMDMtMDQnLCAncmFiaWVzIHNob3QnKTsKICAgIElOU0VSVCBJR05PUkUgSU5UTyB2aXNpdHMgVkFMVUVTICgzLCA4LCAnMjAwOS0wNi0wNCcsICduZXV0ZXJlZCcpOwogICAgSU5TRVJUIElHTk9SRSBJTlRPIHZpc2l0cyBWQUxVRVMgKDQsIDcsICcyMDA4LTA5LTA0JywgJ3NwYXllZCcpOwogICAgQ1JFQVRFIERBVEFCQVNFIElGIE5PVCBFWElTVFMgcGV0Y2xpbmljOwoKICAgIEFMVEVSIERBVEFCQVNFIHBldGNsaW5pYwogICAgREVGQVVMVCBDSEFSQUNURVIgU0VUIHV0ZjgKICAgIERFRkFVTFQgQ09MTEFURSB1dGY4X2dlbmVyYWxfY2k7CgogICAgR1JBTlQgQUxMIFBSSVZJTEVHRVMgT04gcGV0Y2xpbmljLiogVE8gJ3BldGNsaW5pY0AlJyBJREVOVElGSUVEIEJZICdwZXRjbGluaWMnOwo=
+kind: Secret
+metadata:
+  name: db-schema-secret
+type: Opaque
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: mysql
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - image: mysql:5.7.8
+        name: mysql
+        env:
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: dbname
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: username
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: password
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: rootpassword
+        ports:
+        - containerPort: 3306
+          name: mysql
+        readinessProbe:
+          exec:
+            command:
+            - bash
+            - "-c"
+            - |
+              mysql -p$MYSQL_ROOT_PASSWORD -e 'SHOW DATABASES'
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          timeoutSeconds: 1
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - |
+                until mysql -p$MYSQL_ROOT_PASSWORD -e 'SHOW DATABASES'; do echo waiting for mysql server; sleep 2; done;
+                mysql -p$MYSQL_ROOT_PASSWORD -e 'CREATE DATABASE IF NOT EXISTS petclinic;'
+                mysql -p$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE < /srv/schema.sql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+        - name: mysql-conf
+          mountPath: /etc/mysql/conf.d
+        - name: mysql-schem
+          mountPath: /srv
+      volumes:
+      - name: mysql-conf
+        configMap:
+          name: mysql-config
+      - name: mysql-schem
+        secret:
+          secretName: db-schema-secret
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
